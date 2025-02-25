@@ -23,6 +23,30 @@ use Twig\Environment;
  */
 abstract class AbstractDatatable
 {
+    public const LANGUAGES = array(
+        'en' => 'English',
+        'fr' => 'French',
+        'de' => 'German',
+        'es' => 'Spanish',
+        'it' => 'Italian',
+        'pt' => 'Portuguese',
+        'ru' => 'Russian',
+        'zh' => 'Chinese',
+        'ja' => 'Japanese',
+        'ar' => 'Arabic',
+        'hi' => 'Hindi',
+        'bn' => 'Bengali',
+        'sw' => 'Swahili',
+        'mr' => 'Marathi',
+        'ta' => 'Tamil',
+        'tr' => 'Turkish',
+        'pl' => 'Polish',
+        'uk' => 'Ukrainian',
+        'fa' => 'Persian',
+        'ur' => 'Urdu',
+        'he' => 'Hebrew',
+        'th' => 'Thai'
+    );
     protected array $options = [];
     protected array $attributes = [];
 
@@ -39,25 +63,25 @@ abstract class AbstractDatatable
 
     public function __construct(
         EventDispatcherInterface $dispatcher,
-        TranslatorInterface $translator,
-        array $config,
-        string $locale
+        TranslatorInterface      $translator,
+        array                    $config,
+        string                   $locale
     )
     {
         $this->columns = [];
         $this->attributes['id'] = "datatable";
-        
+
         $this->language = $config['language'];
         $this->isLangFromCDN = $config['language_from_cdn'];
         $this->globalController = $config['global_controller'] ?? null;
         $this->locale = $locale;
 
-        if(isset($config['template_parameters'])){
-            if(isset($config['template_parameters']['style'])){
+        if (isset($config['template_parameters'])) {
+            if (isset($config['template_parameters']['style'])) {
                 $this->attributes['data-styling-choicer'] = $config['template_parameters']['style'];
             }
-            if(isset($config['template_parameters']['className'])){
-                $this->attributes['class'] = ' '.$config['template_parameters']['className'];
+            if (isset($config['template_parameters']['className'])) {
+                $this->attributes['class'] = ' ' . $config['template_parameters']['className'];
             }
         }
 
@@ -90,7 +114,7 @@ abstract class AbstractDatatable
      */
     public function addOptions(array $options): self
     {
-        $this->options = array_merge($this->options,$options);
+        $this->options = array_merge($this->options, $options);
 
         return $this;
     }
@@ -132,7 +156,7 @@ abstract class AbstractDatatable
      */
     public function addAttributes(array $attributes): self
     {
-        $this->attributes = array_merge($this->attributes,$attributes);
+        $this->attributes = array_merge($this->attributes, $attributes);
 
         return $this;
     }
@@ -179,7 +203,7 @@ abstract class AbstractDatatable
      */
     public function getSearchableColumns(): array
     {
-        return array_filter($this->columns,function (AbstractColumn $column) {
+        return array_filter($this->columns, function (AbstractColumn $column) {
             return $column->isSearchable();
         });
     }
@@ -190,7 +214,7 @@ abstract class AbstractDatatable
      */
     public function getColumnsByType(string $type): array
     {
-        return array_filter($this->columns,function (AbstractColumn $column) use ($type) {
+        return array_filter($this->columns, function (AbstractColumn $column) use ($type) {
             return $column instanceof $type;
         });
     }
@@ -201,10 +225,10 @@ abstract class AbstractDatatable
      */
     public function getColumn(string $data): ?AbstractColumn
     {
-        $res = array_filter($this->columns,function (AbstractColumn $column) use($data){
-            return $column->getData()===$data;
+        $res = array_filter($this->columns, function (AbstractColumn $column) use ($data) {
+            return $column->getData() === $data;
         });
-        if(count($res)==0){
+        if (count($res) == 0) {
             return null;
         }
         return reset($res);
@@ -246,7 +270,7 @@ abstract class AbstractDatatable
      */
     public function addColumns(array $columns): self
     {
-        $this->columns = array_merge($this->columns,$columns);
+        $this->columns = array_merge($this->columns, $columns);
 
         return $this;
     }
@@ -302,7 +326,7 @@ abstract class AbstractDatatable
      */
     public function getLanguage(): string
     {
-        if($this->language==null || $this->language=='request'){
+        if ($this->language == null || $this->language == 'request') {
             $this->language = $this->locale;
         }
 
@@ -314,11 +338,11 @@ abstract class AbstractDatatable
      */
     public function getFullLanguage(): string
     {
-        if(!isset(LANGUAGES[$this->language])){
-            throw new \Exception(sprintf("'%s' Not Accepted, The Language needs to be a shortcut and one of: %s, or 'request'",$this->language,implode(",",array_keys(LANGUAGES))));
+        if (!isset(self::LANGUAGES[$this->language])) {
+            throw new \Exception(sprintf("'%s' Not Accepted, The Language needs to be a shortcut and one of: %s, or 'request'", $this->language, implode(",", array_keys(LANGUAGES))));
         }
 
-        return LANGUAGES[$this->language];
+        return self::LANGUAGES[$this->language];
     }
 
     /**
@@ -382,7 +406,7 @@ abstract class AbstractDatatable
         $columnDefs = [];
         $i = 0;
         /** @var AbstractColumn $column */
-        foreach ($this->columns as $column){
+        foreach ($this->columns as $column) {
             $columnDefs[] = [
                 'targets' => $i,
                 'visible' => $column->isVisible(),
@@ -397,28 +421,3 @@ abstract class AbstractDatatable
     public abstract function createView(): array;
 
 }
-
-const LANGUAGES = array(
-    'en' => 'English',
-    'fr' => 'French',
-    'de' => 'German',
-    'es' => 'Spanish',
-    'it' => 'Italian',
-    'pt' => 'Portuguese',
-    'ru' => 'Russian',
-    'zh' => 'Chinese',
-    'ja' => 'Japanese',
-    'ar' => 'Arabic',
-    'hi' => 'Hindi',
-    'bn' => 'Bengali',
-    'sw' => 'Swahili',
-    'mr' => 'Marathi',
-    'ta' => 'Tamil',
-    'tr' => 'Turkish',
-    'pl' => 'Polish',
-    'uk' => 'Ukrainian',
-    'fa' => 'Persian',
-    'ur' => 'Urdu',
-    'he' => 'Hebrew',
-    'th' => 'Thai'
-);
